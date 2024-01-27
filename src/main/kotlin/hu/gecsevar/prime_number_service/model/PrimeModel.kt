@@ -9,19 +9,18 @@ data class Range (
 
 object PrimeModel {
 
-    // TODO container
-    val numbers = Collections.synchronizedSet<Int>(mutableSetOf())
-    val ranges = Collections.synchronizedList<Range>(mutableListOf())
-    var rangeMax = 0
+    private val numbers = Collections.synchronizedSet<Int>(mutableSetOf())
+    private val ranges = Collections.synchronizedList<Range>(mutableListOf())
+    private var rangeMax = 0
 
     fun addPrimes(newSet: Set<Int>, range: Int) {
         synchronized(numbers) {
+            synchronized(ranges) {
+                ranges.find {
+                    it.range == range
+                }?.finished = true
+            }
             numbers.addAll(newSet)
-        }
-        synchronized(ranges) {
-            ranges.find {
-                it.range == range
-            }?.finished = true
         }
     }
     fun getNextRange() : Range {
@@ -33,5 +32,14 @@ object PrimeModel {
         }
 
         return res
+    }
+    fun getPrimes(from: Int, to: Int) : String {
+        return synchronized(numbers) {
+            numbers.filter { value ->
+                value in from..to
+            }.joinToString {
+                it.toString()
+            }
+        }
     }
 }

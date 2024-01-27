@@ -11,7 +11,6 @@ class Worker : Thread() {
         while (running) {
             val primes = mutableSetOf<Int>()
 
-            // TODO get range
             val range = PrimeModel.getNextRange().range * 1_000
             for (i in range..range + 999) {
                 if (isPrime(i)) {
@@ -19,7 +18,6 @@ class Worker : Thread() {
                 }
             }
 
-            // TODO write numbers / range
             PrimeModel.addPrimes(primes, range)
         }
     }
