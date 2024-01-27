@@ -16,19 +16,18 @@ import org.springframework.web.context.request.async.DeferredResult
 @RestController
 class MessageController {
 
-    @GetMapping("/run/{thread_count}")
-    fun runService(@PathVariable("thread_count") threadCount: Int): DeferredResult<ResponseEntity<*>> {
+    @GetMapping("/start/{thread_count}")
+    fun startService(@PathVariable("thread_count") threadCount: Int): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
         try {
             PrimeNumberCalculator.start(threadCount)
-            result.setResult(ResponseEntity.ok("Engine started successfully"))
+            result.setResult(ResponseEntity.ok("Engine started successfully!"))
         } catch (ex: Exception) {
             when (ex) {
                 is AlreadyRunningException -> result.setResult(ResponseEntity.status(METHOD_NOT_ALLOWED).body("Engine already running!"))
                 is ExceededMaxThreadCountException -> result.setResult(
-                    ResponseEntity.status(METHOD_NOT_ALLOWED).body("Exceeded preferred engine thread count!")
+                    ResponseEntity.status(METHOD_NOT_ALLOWED).body("Exceeded engine max thread count!")
                 )
-
                 else -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
             }
         }
@@ -39,12 +38,13 @@ class MessageController {
     fun stopService(): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
         PrimeNumberCalculator.stop()
-        result.setResult(ResponseEntity.ok("Engine stopped"))
+        result.setResult(ResponseEntity.ok("Engine stopped!"))
         return result
     }
 
     @GetMapping("/get-prime-numbers/from/{from}/to/{to}")
     fun getPrimeNumbers(@PathVariable("from") from: Int, @PathVariable("to") to: Int): DeferredResult<ResponseEntity<*>> {
+        // TODO add paging
         val result = DeferredResult<ResponseEntity<*>>()
         try {
             result.setResult(ResponseEntity.ok(PrimeModel.getPrimes(from, to)))

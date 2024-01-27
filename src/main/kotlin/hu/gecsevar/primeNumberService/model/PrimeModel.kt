@@ -5,9 +5,19 @@ import java.util.*
 
 class RangeNotProcessedException : Exception() {}
 
+/**
+ * Storage class for prime numbers and the workers search ranges
+ */
 object PrimeModel {
 
+    /**
+     * Thread safe collection for prime numbers
+     */
     private val numbers = Collections.synchronizedSet<Int>(mutableSetOf())
+
+    /**
+     * Workers active/ready ranges
+     */
     private val ranges = Collections.synchronizedList<Boolean>(mutableListOf())
 
     fun addPrimes(newSet: Set<Int>, range: Int) {
@@ -19,7 +29,7 @@ object PrimeModel {
         }
     }
     fun getNextRange() : Int {
-        var result = 0
+        var result : Int
         synchronized(ranges) {
             result = ranges.size * AppEnvironment.workerCalculationRange
             ranges.add(false)
@@ -29,6 +39,7 @@ object PrimeModel {
     }
     @Throws
     fun getPrimes(from: Int, to: Int) : String {
+        // TODO add page support
         synchronized(ranges) {
             if (ranges.isEmpty()) {
                 throw RangeNotProcessedException()
@@ -45,7 +56,6 @@ object PrimeModel {
                 }
             }
         }
-
         return synchronized(numbers) {
             numbers.filter { value ->
                 value in from..to
