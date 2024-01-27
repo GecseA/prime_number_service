@@ -30,8 +30,10 @@ class MessageController {
     @GetMapping("/get-prime-numbers")
     fun getPrimeNumbers(): String {
 
-        return PrimeModel.numbers.joinToString {
-            it.toString()
+        return synchronized(PrimeModel.numbers) {
+            PrimeModel.numbers.joinToString {
+                it.toString()
+            }
         }
     }
 }
