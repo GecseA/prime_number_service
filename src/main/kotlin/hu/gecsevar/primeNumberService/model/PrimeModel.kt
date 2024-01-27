@@ -1,45 +1,55 @@
 package hu.gecsevar.primeNumberService.model
 
+import hu.gecsevar.primeNumberService.properties.AppEnvironment
 import java.util.*
 
-data class Range (
-    val range : Int,
-    var finished : Boolean
-)
+class RangeNotProcessedException : Exception() {}
 
 object PrimeModel {
 
     private val numbers = Collections.synchronizedSet<Int>(mutableSetOf())
-    private val ranges = Collections.synchronizedList<Range>(mutableListOf())
-    private var rangeMax = 0
+    private val ranges = Collections.synchronizedList<Boolean>(mutableListOf())
 
     fun addPrimes(newSet: Set<Int>, range: Int) {
         synchronized(numbers) {
             synchronized(ranges) {
-                ranges.find {
-                    it.range == range
-                }?.finished = true
+                ranges[range / AppEnvironment.workerCalculationRange] = true
             }
             numbers.addAll(newSet)
         }
     }
-    fun getNextRange() : Range {
-        val res : Range
+    fun getNextRange() : Int {
+        var result = 0
         synchronized(ranges) {
-            res = Range(rangeMax, false)
-            ranges.add(res)
-            ++rangeMax
+            result = ranges.size * AppEnvironment.workerCalculationRange
+            ranges.add(false)
         }
 
-        return res
+        return result
     }
+    @Throws
     fun getPrimes(from: Int, to: Int) : String {
-        // TODO not already checked range selected!!!
+        synchronized(ranges) {
+            if (ranges.isEmpty()) {
+                throw RangeNotProcessedException()
+            }
+            val range = (from / AppEnvironment.workerCalculationRange).rangeTo(to / AppEnvironment.workerCalculationRange)
+
+            for(i in range) {
+                if (ranges.size > i) {
+                    if (!ranges[i]) {
+                        throw RangeNotProcessedException()
+                    }
+                } else {
+                    throw RangeNotProcessedException()
+                }
+            }
+        }
 
         return synchronized(numbers) {
             numbers.filter { value ->
                 value in from..to
-            }.joinToString {
+            }.take(AppEnvironment.maxNumbersPerPage).joinToString {
                 it.toString()
             }
         }

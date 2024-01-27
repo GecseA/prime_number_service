@@ -1,11 +1,12 @@
 package hu.gecsevar.primeNumberService.controller
 
 import hu.gecsevar.primeNumberService.model.PrimeModel
-import hu.gecsevar.primeNumberService.properties.AppEnvironment
+import hu.gecsevar.primeNumberService.model.RangeNotProcessedException
 import hu.gecsevar.primeNumberService.rpc.AlreadyRunningException
 import hu.gecsevar.primeNumberService.rpc.ExceededMaxThreadCountException
 import hu.gecsevar.primeNumberService.rpc.PrimeNumberCalculator
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,26 +29,30 @@ class MessageController {
                     ResponseEntity.status(METHOD_NOT_ALLOWED).body("Exceeded preferred engine thread count!")
                 )
 
-                else
-                -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
+                else -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
             }
         }
         return result
     }
 
     @GetMapping("/stop")
-    fun stopService() {
-        // TODO handle error
+    fun stopService(): DeferredResult<ResponseEntity<*>> {
+        val result = DeferredResult<ResponseEntity<*>>()
         PrimeNumberCalculator.stop()
+        result.setResult(ResponseEntity.ok("Engine stopped"))
+        return result
     }
 
     @GetMapping("/get-prime-numbers/from/{from}/to/{to}")
     fun getPrimeNumbers(@PathVariable("from") from: Int, @PathVariable("to") to: Int): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
-        if (to - from > AppEnvironment.restGetNumbersRange) {
-            result.setResult(ResponseEntity.status(METHOD_NOT_ALLOWED).body("Exceeded range limit!"))
-        } else {
+        try {
             result.setResult(ResponseEntity.ok(PrimeModel.getPrimes(from, to)))
+        } catch (ex: Exception) {
+            when (ex) {
+                is RangeNotProcessedException -> result.setResult(ResponseEntity.status(METHOD_NOT_ALLOWED).body("Range not processed yet!"))
+                else -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
+            }
         }
         return result
     }

@@ -1,6 +1,7 @@
 package hu.gecsevar.primeNumberService.rpc
 
 import hu.gecsevar.primeNumberService.model.PrimeModel
+import hu.gecsevar.primeNumberService.properties.AppEnvironment
 import kotlin.math.sqrt
 
 class Worker : Thread() {
@@ -11,14 +12,14 @@ class Worker : Thread() {
         while (running) {
             val primes = mutableSetOf<Int>()
 
-            val range = PrimeModel.getNextRange().range * 1_000
-            for (i in range..range + 999) {
+            val rangeBegin = PrimeModel.getNextRange()
+            for (i in rangeBegin..< rangeBegin + AppEnvironment.workerCalculationRange) {
                 if (isPrime(i)) {
                     primes.add(i)
                 }
             }
 
-            PrimeModel.addPrimes(primes, range)
+            PrimeModel.addPrimes(primes, rangeBegin)
         }
     }
 

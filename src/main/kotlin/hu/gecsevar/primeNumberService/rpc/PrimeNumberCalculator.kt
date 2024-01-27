@@ -4,7 +4,6 @@ import hu.gecsevar.primeNumberService.properties.AppEnvironment
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
-import kotlin.jvm.Throws
 
 class ExceededMaxThreadCountException : Exception() {}
 class AlreadyRunningException : Exception() {}
@@ -19,8 +18,7 @@ object PrimeNumberCalculator {
         if (threadCount !in 1..AppEnvironment.engineMaxThreadCount) {
             throw ExceededMaxThreadCountException()
         }
-        if (true) {
-            // TODO
+        if (::threadPool.isInitialized && !threadPool.isTerminated) {
             throw AlreadyRunningException()
         }
         threadPool = Executors.newScheduledThreadPool(threadCount)
@@ -35,7 +33,6 @@ object PrimeNumberCalculator {
         }
     }
 
-    // TODO stop
     fun stop() {
         callableTasks.forEach {
             it.interrupt()
