@@ -36,7 +36,7 @@ class CheckHTTPResponse {
     @Throws(AlreadyRunningException::class)
     fun reStartService_AlreadyRunningException() {
         restTemplate!!.getForObject("http://localhost:$port/start/1",String::class.java)
-        assertThat(restTemplate!!.getForObject("http://localhost:$port/start/1",String::class.java))
+        assertThat(restTemplate.getForObject("http://localhost:$port/start/1",String::class.java))
             .contains("Engine already running!")
     }
     @Test
