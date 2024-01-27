@@ -1,4 +1,4 @@
-package hu.gecsevar.prime_number_service.model
+package hu.gecsevar.primeNumberService.model
 
 import java.util.*
 
@@ -34,6 +34,8 @@ object PrimeModel {
         return res
     }
     fun getPrimes(from: Int, to: Int) : String {
+        // TODO not already checked range selected!!!
+
         return synchronized(numbers) {
             numbers.filter { value ->
                 value in from..to

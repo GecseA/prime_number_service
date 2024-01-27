@@ -1,6 +1,6 @@
-package hu.gecsevar.prime_number_service.rpc
+package hu.gecsevar.primeNumberService.rpc
 
-import hu.gecsevar.prime_number_service.model.PrimeModel
+import hu.gecsevar.primeNumberService.model.PrimeModel
 import kotlin.math.sqrt
 
 class Worker : Thread() {

@@ -1,4 +1,4 @@
-package hu.gecsevar.prime_number_service
+package hu.gecsevar.primeNumberService
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

@@ -1,4 +1,4 @@
-package hu.gecsevar.prime_number_service
+package hu.gecsevar.primeNumberService
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

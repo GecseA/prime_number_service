@@ -1,19 +1,31 @@
-package hu.gecsevar.prime_number_service.rpc
+package hu.gecsevar.primeNumberService.rpc
 
+import hu.gecsevar.primeNumberService.properties.AppEnvironment
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.Throws
+
+class ExceededMaxThreadCountException : Exception() {}
+class AlreadyRunningException : Exception() {}
 
 object PrimeNumberCalculator {
 
     private lateinit var threadPool : ScheduledExecutorService
     private var callableTasks = mutableListOf<Thread>()
 
-    // TODO start max 5 thread
-    fun start() {
-        threadPool = Executors.newScheduledThreadPool(5)
+    @Throws
+    fun start(threadCount: Int) {
+        if (threadCount !in 1..AppEnvironment.engineMaxThreadCount) {
+            throw ExceededMaxThreadCountException()
+        }
+        if (true) {
+            // TODO
+            throw AlreadyRunningException()
+        }
+        threadPool = Executors.newScheduledThreadPool(threadCount)
         threadPool.let { th ->
-            repeat(5) {_ ->
+            repeat(threadCount) {_ ->
                 val temp = Worker()
                 callableTasks.add(temp)
                 th.submit(
