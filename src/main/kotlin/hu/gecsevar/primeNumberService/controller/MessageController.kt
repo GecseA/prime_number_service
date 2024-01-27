@@ -5,6 +5,12 @@ import hu.gecsevar.primeNumberService.model.RangeNotProcessedException
 import hu.gecsevar.primeNumberService.rpc.AlreadyRunningException
 import hu.gecsevar.primeNumberService.rpc.ExceededMaxThreadCountException
 import hu.gecsevar.primeNumberService.rpc.PrimeNumberCalculator
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.info.Info
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import org.springframework.http.ResponseEntity
@@ -13,12 +19,29 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.context.request.async.DeferredResult
 
+@Configuration
+@OpenAPIDefinition(info = Info(title = "Prime number service", description = "Simple backend app which collection prime numbers, store and could response a ranged list", version = "1.0.0"))
+class OpenAPIConfig
+
 @RestController
 class MessageController {
 
-    @GetMapping("/")
-    fun index()= "Hello World!"
+    @Operation(summary = "Hello word", description = "The service running and healthy")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successful Operation"),
+        ]
+    )
+    @GetMapping("/healthy")
+    fun index()= "OK"
 
+    @Operation(summary = "Start the background engine", description = "Start number of thread_count different workers and collecting prime numbers")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successful Operation"),
+            ApiResponse(responseCode = "405", description = "Engine already started OR request thread count is to high"),
+        ]
+    )
     @GetMapping("/start/{thread_count}")
     fun startService(@PathVariable("thread_count") threadCount: Int): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
@@ -37,6 +60,12 @@ class MessageController {
         return result
     }
 
+    @Operation(summary = "Stop the background engine", description = "Stop the search but keep the founded numbers")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successful Operation"),
+        ]
+    )
     @GetMapping("/stop")
     fun stopService(): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
@@ -45,6 +74,13 @@ class MessageController {
         return result
     }
 
+    @Operation(summary = "Get the prime numbers", description = "Get the prime numbers. The result set is limited by environment variable")
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Successful Operation"),
+            ApiResponse(responseCode = "405", description = "The specified range is not currently processed"),
+        ]
+    )
     @GetMapping("/get-prime-numbers/from/{from}/to/{to}")
     fun getPrimeNumbers(@PathVariable("from") from: Int, @PathVariable("to") to: Int): DeferredResult<ResponseEntity<*>> {
         // TODO add paging

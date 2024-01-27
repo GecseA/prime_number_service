@@ -22,8 +22,8 @@ class CheckHTTPResponse {
     @Test
     @Throws(Exception::class)
     fun shouldPassIfStringMatches() {
-        assertThat(restTemplate!!.getForObject("http://localhost:$port/",String::class.java))
-            .contains("Hello World!")
+        assertThat(restTemplate!!.getForObject("http://localhost:$port/healthy",String::class.java))
+            .contains("OK")
     }
 
     @Test
