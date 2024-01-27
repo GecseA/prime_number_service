@@ -16,6 +16,9 @@ import org.springframework.web.context.request.async.DeferredResult
 @RestController
 class MessageController {
 
+    @GetMapping("/")
+    fun index()= "Hello World!"
+
     @GetMapping("/start/{thread_count}")
     fun startService(@PathVariable("thread_count") threadCount: Int): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()

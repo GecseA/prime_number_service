@@ -37,11 +37,13 @@ object PrimeNumberCalculator {
     }
 
     fun stop() {
-        callableTasks.forEach {
-            it.interrupt()
+        if (::threadPool.isInitialized) {
+            callableTasks.forEach {
+                it.interrupt()
+            }
+            callableTasks.clear()
+            threadPool.shutdownNow()
+            threadPool.awaitTermination(1000, TimeUnit.MILLISECONDS)
         }
-        callableTasks.clear()
-        threadPool.shutdownNow()
-        threadPool.awaitTermination(1000, TimeUnit.MILLISECONDS)
     }
 }
