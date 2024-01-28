@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,7 +39,7 @@ class MessageController {
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successful Operation"),
-            ApiResponse(responseCode = "405", description = "Engine already started OR request thread count is to high"),
+            ApiResponse(responseCode = "400", description = "Engine already started OR request thread count is to high"),
         ]
     )
     @GetMapping("/start/{thread_count}")
@@ -50,9 +50,9 @@ class MessageController {
             result.setResult(ResponseEntity.ok("Engine started successfully!"))
         } catch (ex: Exception) {
             when (ex) {
-                is AlreadyRunningException -> result.setResult(ResponseEntity.status(METHOD_NOT_ALLOWED).body("Engine already running!"))
+                is AlreadyRunningException -> result.setResult(ResponseEntity.status(BAD_REQUEST).body("Engine already running!"))
                 is ExceededMaxThreadCountException -> result.setResult(
-                    ResponseEntity.status(METHOD_NOT_ALLOWED).body("Exceeded engine max thread count!")
+                    ResponseEntity.status(BAD_REQUEST).body("Exceeded engine max thread count!")
                 )
                 else -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
             }
@@ -78,7 +78,7 @@ class MessageController {
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "Successful Operation"),
-            ApiResponse(responseCode = "405", description = "The specified range is not currently processed"),
+            ApiResponse(responseCode = "400", description = "The specified range is not currently processed"),
         ]
     )
     @GetMapping("/get-prime-numbers/from/{from}/to/{to}")
@@ -89,7 +89,7 @@ class MessageController {
             result.setResult(ResponseEntity.ok(PrimeModel.getPrimes(from, to)))
         } catch (ex: Exception) {
             when (ex) {
-                is RangeNotProcessedException -> result.setResult(ResponseEntity.status(METHOD_NOT_ALLOWED).body("Range not processed yet!"))
+                is RangeNotProcessedException -> result.setResult(ResponseEntity.status(BAD_REQUEST).body("Range not processed yet!"))
                 else -> result.setResult(ResponseEntity.status(INTERNAL_SERVER_ERROR).body(ex.message))
             }
         }
