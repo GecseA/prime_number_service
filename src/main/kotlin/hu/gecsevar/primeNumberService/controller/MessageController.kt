@@ -4,7 +4,7 @@ import hu.gecsevar.primeNumberService.model.PrimeModel
 import hu.gecsevar.primeNumberService.model.RangeNotProcessedException
 import hu.gecsevar.primeNumberService.rpc.AlreadyRunningException
 import hu.gecsevar.primeNumberService.rpc.ExceededMaxThreadCountException
-import hu.gecsevar.primeNumberService.rpc.PrimeNumberCalculator
+import hu.gecsevar.primeNumberService.rpc.ThreadExecutor
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.info.Info
@@ -46,7 +46,7 @@ class MessageController {
     fun startService(@PathVariable("thread_count") threadCount: Int): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
         try {
-            PrimeNumberCalculator.start(threadCount)
+            ThreadExecutor.start(threadCount)
             result.setResult(ResponseEntity.ok("Engine started successfully!"))
         } catch (ex: Exception) {
             when (ex) {
@@ -69,7 +69,7 @@ class MessageController {
     @GetMapping("/stop")
     fun stopService(): DeferredResult<ResponseEntity<*>> {
         val result = DeferredResult<ResponseEntity<*>>()
-        PrimeNumberCalculator.stop()
+        ThreadExecutor.stop()
         result.setResult(ResponseEntity.ok("Engine stopped!"))
         return result
     }
