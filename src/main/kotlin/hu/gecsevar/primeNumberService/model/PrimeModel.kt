@@ -31,6 +31,9 @@ object PrimeModel {
     fun getNextRange() : Int {
         var result : Int
         synchronized(ranges) {
+            if (ranges.size == AppEnvironment.maxPrimeNumberRange) {
+                return -1
+            }
             result = ranges.size * AppEnvironment.workerCalculationRange
             ranges.add(false)
         }

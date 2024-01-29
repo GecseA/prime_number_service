@@ -1,5 +1,7 @@
 package hu.gecsevar.primeNumberService.properties
 
+import kotlin.Int.Companion.MAX_VALUE
+
 object AppEnvironment {
 
     /**
@@ -11,4 +13,8 @@ object AppEnvironment {
      * in single/multi thread case the preferred range for each thread. Should be power of 10!
      */
     val workerCalculationRange = 1_000
+    /**
+     * Limited range for Prime number searching
+     */
+    val maxPrimeNumberRange = MAX_VALUE
 }
