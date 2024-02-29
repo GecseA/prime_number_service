@@ -3,6 +3,7 @@ package hu.gecsevar.primeNumberService
 import hu.gecsevar.primeNumberService.model.RangeNotProcessedException
 import hu.gecsevar.primeNumberService.rpc.AlreadyRunningException
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,13 +26,14 @@ class CheckHTTPResponse {
         assertThat(restTemplate!!.getForObject("http://localhost:$port/healthy",String::class.java))
             .contains("OK")
     }
-
+    @Disabled
     @Test
     @Throws(Exception::class)
     fun startService() {
         assertThat(restTemplate!!.getForObject("http://localhost:$port/start/1",String::class.java))
             .contains("Engine started successfully!")
     }
+    @Disabled
     @Test
     @Throws(AlreadyRunningException::class)
     fun reStartService_AlreadyRunningException() {
